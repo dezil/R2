@@ -1,7 +1,7 @@
-import logging
 import os
 import random
 
+from loguru import logger
 from pygame import mixer
 
 
@@ -19,7 +19,7 @@ class Audio(object):
         self.play_sound(file_path)
 
     def play_sound(self, filename):
-        logging.debug("Loading %s", filename)
+        logger.debug("Loading {file}", file=filename)
         mixer.music.load(filename)
-        logging.info("Playing %s", filename)
+        logger.info("Playing {file}", file=filename)
         mixer.music.play()

@@ -1,8 +1,8 @@
 import constant
-import logging
 import time
 
 from evdev import InputDevice, categorize, ecodes, list_devices
+from loguru import logger
 
 
 def dump_devices():
@@ -22,16 +22,16 @@ def wait_for_device(name):
 
 dump_devices()
 
-logging.info("Connecting to devices...")
+logger.info("Connecting to devices...")
 
 # creates object 'gamepad' to store the data
 # you can call it whatever you like
 gamepad = wait_for_device(constant.GAMEPAD)
 
 # prints out device info at start
-logging.info(gamepad)
+logger.info(gamepad)
 
-logging.info("Running")
+logger.info("Running")
 
 # evdev takes care of polling the controller in a loop
 for event in gamepad.read_loop():
