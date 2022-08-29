@@ -1,102 +1,53 @@
+import constant
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
+os.environ["LOGURU_LEVEL"] = constant.LOG_LEVEL
 
 import asyncio
-import constant
-import time
+import pygame
+import sys
 
-from audio import Audio
-from buildhat import Motor
-from evdev import InputDevice, categorize, ecodes, list_devices
+from managers import AudioManager, InputManager, MotorManager
+from autonomous import Autonomous
 from loguru import logger
 
-audio = Audio(constant.AUDIO_PATH, constant.AUDIO_VOLUME)
-
-
-def get_device(name, blocking=False):
-    while True:
-        devices = [InputDevice(path) for path in list_devices()]
-        for device in devices:
-            if device.name == name:
-                return device
-        if blocking:
-            time.sleep(5)
-        else:
-            return None
-
-
-def run_periscope(motor):
-    if motor.get_position() >= 700:
-        logger.info("Running Periscope: Down")
-        motor.run_for_degrees(720, -25, False)
-    else:
-        logger.info("Running Periscope: Up")
-        motor.run_for_degrees(720, 25, False)
-
-
-def run_rotate(motors, speed):
-    logger.info("Running Rotate: " + str(speed))
-    for motor in motors:
-        if speed == 0:
-            motor.stop()
-        else:
-            motor.start(speed)
+audio_manager = AudioManager(constant.AUDIO_PATH, constant.AUDIO_VOLUME)
+autonomous = Autonomous(audio_manager)
+motor_manager = MotorManager()
+input_manager = InputManager(audio_manager, autonomous, motor_manager)
 
 
 async def main():
-    logger.info("Connecting to devices...")
+    logger.info("Starting...")
 
-    # creates object 'gamepad' to store the data
-    gamepad = get_device(constant.GAMEPAD, True)
-    motor_a = Motor("A")
-    motor_c = Motor("C")
-    motor_d = Motor("D")
+    try:
+        pygame.init()
+        input_manager.init()
 
-    logger.info("Running")
+        if len(sys.argv) == 1 and sys.argv[0] == "dump":
+            input_manager.list_devices()
+            return
 
-    # loop and filter by event code and logger.info the mapped label
-    for event in gamepad.read_loop():
-        if event.type == ecodes.EV_KEY:  # Key
-            if event.value == 1:  # Key Down
-                if event.code == 307:  # iOS
-                    logger.info("Event: iOS")
-                    audio.play_random_sound("alarms")
-                elif event.code == 308:  # Triangle
-                    logger.info("Event: Triangle")
-                    audio.play_random_sound("misc")
-                elif event.code == 305:  # A
-                    logger.info("Event: A")
-                    audio.play_random_sound("scream")
-                elif event.code == 304:  # X
-                    logger.info("Event: X")
-                    audio.play_random_sound("music")
-                elif event.code == 315:  # Start
-                    logger.info("Event: Start")
-        if event.type == ecodes.EV_ABS:  # Axis
-            if event.code == 0:  # X Axis
-                logger.info("Event X Axis: " + str(event.value))
-                if event.value == 0:  # Full Up
-                    run_periscope(motor_a)
+        logger.info("Started")
+        while True:
+            event = pygame.event.wait(1)
+            logger.trace("{} Event", pygame.event.event_name(event.type))
 
-                if event.value == 255:  # Full Down
-                    logger.info("BOTTOM")
+            if event.type == pygame.QUIT:
+                break
 
-            elif event.code == 1:  # Y Axis
-                logger.info("Event Y Axis: " + str(event.value))
-                if event.value == 0:  # Full Right
-                    run_rotate([motor_c, motor_d], -40)
-                elif 1 <= event.value <= 42:  # Partial Right
-                    run_rotate([motor_c, motor_d], -30)
-                elif 43 <= event.value <= 127:  # Partial Right
-                    run_rotate([motor_c, motor_d], -20)
-                elif event.value == 128:  # Stop
-                    run_rotate([motor_c, motor_d], 0)
-                elif 129 <= event.value <= 213:  # Partial Left
-                    run_rotate([motor_c, motor_d], 20)
-                elif 214 <= event.value <= 254:  # Partial Left
-                    run_rotate([motor_c, motor_d], 30)
-                elif event.value == 255:  # Full Left
-                    run_rotate([motor_c, motor_d], 40)
+            input_manager.handle(event)
+
+        logger.info("Stopping...")
+    except Exception as ex:
+        logger.error(ex)
+    finally:
+        autonomous.stop()
+        input_manager.quit()
+        pygame.quit()
+
+    logger.info("Stopped")
 
 
 if __name__ == "__main__":
