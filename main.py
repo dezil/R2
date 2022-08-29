@@ -10,6 +10,7 @@ from audio import Audio
 from buildhat import Motor
 from evdev import InputDevice, categorize, ecodes, list_devices
 
+logging.basicConfig(filename="latest.log", encoding="utf-8", level=logging.DEBUG)
 audio = Audio(constant.AUDIO_PATH, constant.AUDIO_VOLUME)
 
 
