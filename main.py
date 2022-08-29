@@ -10,7 +10,7 @@ from audio import Audio
 from buildhat import Motor
 from evdev import InputDevice, categorize, ecodes, list_devices
 
-audio = Audio(constant.AUDIO_PATH, 1.0)
+audio = Audio(constant.AUDIO_PATH, constant.AUDIO_VOLUME)
 
 
 def get_device(name, blocking=False):
