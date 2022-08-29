@@ -48,9 +48,9 @@ async def main():
 
     # creates object 'gamepad' to store the data
     gamepad = get_device(constant.GAMEPAD, True)
-    motor_a = Motor('A')
-    motor_c = Motor('C')
-    motor_d = Motor('D')
+    motor_a = Motor("A")
+    motor_c = Motor("C")
+    motor_d = Motor("D")
 
     logging.info("Running")
 
@@ -99,5 +99,5 @@ async def main():
                     run_rotate([motor_c, motor_d], -40)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())
