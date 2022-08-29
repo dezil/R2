@@ -85,19 +85,19 @@ async def main():
             elif event.code == 1:  # Y Axis
                 logging.info("Event Y Axis: " + str(event.value))
                 if event.value == 0:  # Full Right
-                    run_rotate([motor_c, motor_d], 40)
+                    run_rotate([motor_c, motor_d], -40)
                 elif 1 <= event.value <= 42:  # Partial Right
-                    run_rotate([motor_c, motor_d], 30)
+                    run_rotate([motor_c, motor_d], -30)
                 elif 43 <= event.value <= 127:  # Partial Right
-                    run_rotate([motor_c, motor_d], 20)
+                    run_rotate([motor_c, motor_d], -20)
                 elif event.value == 128:  # Stop
                     run_rotate([motor_c, motor_d], 0)
                 elif 129 <= event.value <= 213:  # Partial Left
-                    run_rotate([motor_c, motor_d], -20)
+                    run_rotate([motor_c, motor_d], 20)
                 elif 214 <= event.value <= 254:  # Partial Left
-                    run_rotate([motor_c, motor_d], -30)
+                    run_rotate([motor_c, motor_d], 30)
                 elif event.value == 255:  # Full Left
-                    run_rotate([motor_c, motor_d], -40)
+                    run_rotate([motor_c, motor_d], 40)
 
 
 if __name__ == "__main__":
