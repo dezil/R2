@@ -12,7 +12,7 @@ from managers import AudioManager, InputManager, MotorManager
 from autonomous import Autonomous
 from loguru import logger
 
-audio_manager = AudioManager(constant.AUDIO_PATH, constant.AUDIO_VOLUME)
+audio_manager = AudioManager()
 autonomous = Autonomous(audio_manager)
 motor_manager = MotorManager()
 input_manager = InputManager(audio_manager, autonomous, motor_manager)
