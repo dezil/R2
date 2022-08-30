@@ -2,6 +2,7 @@ import constant
 
 from buildhat import Motor, MotorPair
 from loguru import logger
+from serial import SerialException
 
 
 class MotorManager(object):
@@ -11,8 +12,11 @@ class MotorManager(object):
         self.rotation_motor: MotorPair | None = None
 
     def init(self):
-        self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
-        self.rotation_motor = MotorPair(constant.ROTATION_MOTOR[0], constant.ROTATION_MOTOR[1])
+        try:
+            self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
+            self.rotation_motor = MotorPair(constant.ROTATION_MOTOR[0], constant.ROTATION_MOTOR[1])
+        except SerialException as ex:
+            logger.error(ex)
 
     def run_periscope(self, degrees: int, threshold: int, speed: int):
         if self.periscope_motor is None:
