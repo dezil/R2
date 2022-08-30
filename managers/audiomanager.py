@@ -1,16 +1,16 @@
 import constant
 import os
+import pygame
 import random
 
 from loguru import logger
-from pygame import mixer
 
 
 class AudioManager(object):
 
     def __init__(self):
-        mixer.init()
-        mixer.music.set_volume(float(constant.AUDIO_VOLUME))
+        pygame.mixer.init()
+        pygame.mixer.music.set_volume(float(constant.AUDIO_VOLUME))
 
     def play_random_sound(self, category):
         category_path = os.path.join(constant.AUDIO_PATH, category)
@@ -19,6 +19,6 @@ class AudioManager(object):
 
     def play_sound(self, filename):
         logger.trace("Loading {}", filename)
-        mixer.music.load(filename)
+        pygame.mixer.music.load(filename)
         logger.info("Playing {}", filename)
-        mixer.music.play()
+        pygame.mixer.music.play()
