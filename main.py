@@ -24,6 +24,7 @@ async def main():
     try:
         pygame.init()
         input_manager.init()
+        motor_manager.init()
 
         if len(sys.argv) == 1 and sys.argv[0] == "dump":
             input_manager.list_devices()

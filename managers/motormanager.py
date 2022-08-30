@@ -1,3 +1,5 @@
+import constant
+
 from buildhat import Motor, MotorPair
 from loguru import logger
 
@@ -8,9 +10,9 @@ class MotorManager(object):
         self.periscope_motor: Motor | None = None
         self.rotation_motor: MotorPair | None = None
 
-    def init(self, periscope_motor: Motor, rotation_motor: MotorPair):
-        self.periscope_motor = periscope_motor
-        self.rotation_motor = rotation_motor
+    def init(self):
+        self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
+        self.rotation_motor = MotorPair(constant.ROTATION_MOTOR[0], constant.ROTATION_MOTOR[1])
 
     def run_periscope(self, degrees: int, threshold: int, speed: int):
         if self.periscope_motor is None:
