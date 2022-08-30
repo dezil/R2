@@ -30,6 +30,6 @@ class Autonomous(object):
             self.stop()
 
     async def run(self):
-        while True:
+        while self.task is not None and not self.task.cancelled():
             self.audio_manager.play_random_sound(constant.AUTO_CATEGORY)
             await asyncio.sleep(constant.AUTO_INTERVAL)
