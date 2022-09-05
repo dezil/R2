@@ -1,6 +1,6 @@
 import constant
 
-from buildhat import Motor, MotorPair
+from buildhat import Motor
 from loguru import logger
 
 
@@ -8,12 +8,12 @@ class MotorManager(object):
 
     def __init__(self):
         self.periscope_motor: Motor | None = None
-        self.rotation_motor: MotorPair | None = None
+        self.rotation_motor: Motor | None = None
 
     def init(self):
         try:
             self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
-            self.rotation_motor = MotorPair(constant.ROTATION_MOTOR[0], constant.ROTATION_MOTOR[1])
+            self.rotation_motor = Motor(constant.ROTATION_MOTOR)
         except Exception as ex:
             logger.error(ex)
 
