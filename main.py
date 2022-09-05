@@ -34,6 +34,9 @@ async def main():
         logger.info("Started")
         while True:
             event = pygame.event.wait(1000)
+            if event.type == pygame.NOEVENT:
+                continue
+
             logger.trace("{} Event", pygame.event.event_name(event.type))
 
             if event.type == pygame.QUIT:
