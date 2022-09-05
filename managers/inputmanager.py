@@ -1,6 +1,6 @@
+import constant
 import pygame
 
-import constant
 from autonomous import Autonomous
 from loguru import logger
 from managers import AudioManager, MotorManager
