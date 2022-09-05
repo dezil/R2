@@ -49,6 +49,7 @@ async def main():
         logger.error(ex)
     finally:
         autonomous.stop()
+        motor_manager.quit()
         input_manager.quit()
         pygame.quit()
 

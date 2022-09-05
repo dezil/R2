@@ -17,6 +17,9 @@ class MotorManager(object):
         except Exception as ex:
             logger.error(ex)
 
+    def quit(self):
+        self.run_rotation(0)
+
     def run_periscope(self, degrees: int, threshold: int, speed: int):
         if self.periscope_motor is None:
             return
