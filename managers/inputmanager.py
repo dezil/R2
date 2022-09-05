@@ -53,6 +53,11 @@ class InputManager(object):
             # Up Button
             if event.button == 4:
                 logger.trace("Up Button")
+                self.motor_manager.run_periscope(
+                    constant.PERISCOPE_DEGREES,
+                    constant.PERISCOPE_THRESHOLD,
+                    constant.PERISCOPE_SPEED
+                )
 
             # Right Button
             if event.button == 5:
@@ -105,11 +110,7 @@ class InputManager(object):
         if event.type == pygame.JOYAXISMOTION:
             # Full Up
             if event.axis == 1 and event.value <= -1.0:
-                self.motor_manager.run_periscope(
-                    constant.PERISCOPE_DEGREES,
-                    constant.PERISCOPE_THRESHOLD,
-                    constant.PERISCOPE_SPEED
-                )
+                pass
 
             # Full Down
             if event.axis == 1 and event.value >= 1.0:
