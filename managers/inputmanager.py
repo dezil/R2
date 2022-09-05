@@ -17,6 +17,10 @@ class InputManager(object):
     def init(self):
         pygame.joystick.init()
 
+    def quit(self):
+        self.joysticks = None
+        pygame.joystick.quit()
+
     def handle(self, event: pygame.event):
         if event.type == pygame.JOYDEVICEADDED:
             joystick = pygame.joystick.Joystick(event.device_index)
@@ -30,20 +34,72 @@ class InputManager(object):
         if event.type == pygame.JOYBUTTONUP:
             self.autonomous.stop()
 
-            # iOS Button
-            if event.button == 307:
-                self.audio_manager.play_random_sound("alarms")
+            # Select Button
+            if event.button == 0:
+                logger.trace("Select Button")
+
+            # L3 Button
+            if event.button == 1:
+                logger.trace("L3 Button")
+
+            # R3 Button
+            if event.button == 2:
+                logger.trace("R3 Button")
+
+            # Start Button
+            if event.button == 3:
+                logger.trace("Start Button")
+
+            # Up Button
+            if event.button == 4:
+                logger.trace("Up Button")
+
+            # Right Button
+            if event.button == 5:
+                logger.trace("Right Button")
+
+            # Down Button
+            if event.button == 6:
+                logger.trace("Down Button")
+
+            # Left Button
+            if event.button == 7:
+                logger.trace("Left Button")
+
+            # L2 Button
+            if event.button == 8:
+                logger.trace("L2 Button")
+
+            # R2 Button
+            if event.button == 9:
+                logger.trace("R2 Button")
+
+            # L1 Button
+            if event.button == 10:
+                logger.trace("L1 Button")
+
+            # R1 Button
+            if event.button == 11:
+                logger.trace("R1 Button")
 
             # Triangle Button
-            if event.button == 308:
+            if event.button == 12:
+                logger.trace("Triangle Button")
+                self.audio_manager.play_random_sound("alarms")
+
+            # Circle Button
+            if event.button == 13:
+                logger.trace("Circle Button")
                 self.audio_manager.play_random_sound("misc")
 
-            # A Button
-            if event.button == 305:
+            # Cross Button
+            if event.button == 14:
+                logger.trace("Cross Button")
                 self.audio_manager.play_random_sound("scream")
 
-            # X Button
-            if event.button == 315:
+            # Square Button
+            if event.button == 15:
+                logger.trace("Square Button")
                 self.audio_manager.play_random_sound("music")
 
         if event.type == pygame.JOYAXISMOTION:
@@ -82,10 +138,6 @@ class InputManager(object):
             # Partial Right
             if event.axis == 0 and 0.30 <= event.value <= 0.36:
                 self.motor_manager.run_rotation(-constant.ROTATION_SPEED_LOW)
-
-    def quit(self):
-        self.joysticks = None
-        pygame.joystick.quit()
 
     def list_devices(self):
         logger.info("Devices:")
