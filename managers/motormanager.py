@@ -21,7 +21,7 @@ class MotorManager(object):
         self.run_rotation(0, 0)
 
     def run_periscope(self, degrees: int, threshold: int, speed: int,
-                      degrees_minimum: int | None = None, degrees_maximum: int | None = None):
+                      degrees_minimum: int = None, degrees_maximum: int = None):
         if self.periscope_motor is None:
             return
 
