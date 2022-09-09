@@ -132,17 +132,17 @@ class InputManager(object):
             if event.axis == 0 and 0.10 <= event.value >= -0.10:
                 self.motor_manager.run_rotation(0)
 
-            # Full Right
-            if event.axis == 0 and event.value >= 1.0:
-                self.motor_manager.run_rotation(-constant.ROTATION_SPEED_HIGH)
+            # Partial Right
+            if event.axis == 0 and 0.30 <= event.value <= 0.36:
+                self.motor_manager.run_rotation(-constant.ROTATION_SPEED_LOW)
 
             # Partial Right
             if event.axis == 0 and 0.63 <= event.value <= 0.79:
                 self.motor_manager.run_rotation(-constant.ROTATION_SPEED_MEDIUM)
 
-            # Partial Right
-            if event.axis == 0 and 0.30 <= event.value <= 0.36:
-                self.motor_manager.run_rotation(-constant.ROTATION_SPEED_LOW)
+            # Full Right
+            if event.axis == 0 and event.value >= 1.0:
+                self.motor_manager.run_rotation(-constant.ROTATION_SPEED_HIGH)
 
     def list_devices(self):
         logger.info("Devices:")
