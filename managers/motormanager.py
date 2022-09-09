@@ -25,10 +25,10 @@ class MotorManager(object):
             return
 
         if self.periscope_motor.get_position() >= threshold:
-            logger.trace("Starting Periscope ({} @ {})", degrees, -speed)
+            logger.info("Starting Periscope ({} @ {})", degrees, -speed)
             self.periscope_motor.run_for_degrees(degrees, -speed, False)
         else:
-            logger.trace("Starting Periscope ({} @ {})", degrees, speed)
+            logger.info("Starting Periscope ({} @ {})", degrees, speed)
             self.periscope_motor.run_for_degrees(degrees, speed, False)
 
     def run_rotation(self, threshold: int, speed: int):
@@ -36,8 +36,8 @@ class MotorManager(object):
             return
 
         if -threshold <= speed <= threshold:
-            logger.trace("Stopping Rotation")
+            logger.info("Stopping Rotation")
             self.rotation_motor.stop()
         else:
-            logger.trace("Starting Rotation ({})", str(speed))
+            logger.info("Starting Rotation ({})", str(speed))
             self.rotation_motor.start(speed)
