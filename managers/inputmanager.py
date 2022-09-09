@@ -1,5 +1,6 @@
 import constant
 import pygame
+import util
 
 from autonomous import Autonomous
 from loguru import logger
@@ -116,33 +117,12 @@ class InputManager(object):
             if event.axis == 1 and event.value >= 1.0:
                 self.autonomous.toggle()
 
-            # Full Left
-            if event.axis == 0 and event.value <= -1.0:
-                self.motor_manager.run_rotation(constant.ROTATION_SPEED_HIGH)
-
-            # Partial Left
-            if event.axis == 0 and -0.63 >= event.value >= -0.79:
-                self.motor_manager.run_rotation(constant.ROTATION_SPEED_MEDIUM)
-
-            # Partial Left
-            if event.axis == 0 and -0.30 >= event.value >= -0.36:
-                self.motor_manager.run_rotation(constant.ROTATION_SPEED_LOW)
-
-            # Center
-            if event.axis == 0 and -0.01 <= event.value <= 0.01:
-                self.motor_manager.run_rotation(0)
-
-            # Partial Right
-            if event.axis == 0 and 0.30 <= event.value <= 0.36:
-                self.motor_manager.run_rotation(-constant.ROTATION_SPEED_LOW)
-
-            # Partial Right
-            if event.axis == 0 and 0.63 <= event.value <= 0.79:
-                self.motor_manager.run_rotation(-constant.ROTATION_SPEED_MEDIUM)
-
-            # Full Right
-            if event.axis == 0 and event.value >= 1.0:
-                self.motor_manager.run_rotation(-constant.ROTATION_SPEED_HIGH)
+            # Left / Right
+            if event.axis == 0:
+                self.motor_manager.run_rotation(
+                    constant.ROTATION_THRESHOLD,
+                    util.scale(event.value, (0.0, 1.0), (0, 100))
+                )
 
     def list_devices(self):
         logger.info("Devices:")
