@@ -55,11 +55,10 @@ class InputManager(object):
             if event.button == 4:
                 logger.trace("Up Button")
                 self.motor_manager.run_periscope(
-                    constant.PERISCOPE_DEGREES,
-                    constant.PERISCOPE_THRESHOLD,
-                    constant.PERISCOPE_SPEED,
                     constant.PERISCOPE_DEGREES_MINIMUM,
-                    constant.PERISCOPE_DEGREES_MAXIMUM
+                    constant.PERISCOPE_DEGREES_MAXIMUM,
+                    constant.PERISCOPE_THRESHOLD,
+                    constant.PERISCOPE_SPEED
                 )
 
             # Right Button
