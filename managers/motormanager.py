@@ -35,6 +35,12 @@ class MotorManager(object):
         if self.rotation_motor is None:
             return
 
+        if constant.ROTATION_INVERT:
+            if speed > 0:
+                speed = -speed
+            elif speed < 0:
+                speed = abs(speed)
+
         if -threshold <= speed <= threshold:
             logger.info("Stopping Rotation")
             self.rotation_motor.stop()
