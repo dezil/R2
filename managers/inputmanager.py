@@ -129,7 +129,7 @@ class InputManager(object):
                 self.motor_manager.run_rotation(constant.ROTATION_SPEED_LOW)
 
             # Center
-            if event.axis == 0 and 0.10 <= event.value >= -0.10:
+            if event.axis == 0 and -0.01 <= event.value <= 0.01:
                 self.motor_manager.run_rotation(0)
 
             # Partial Right
