@@ -20,14 +20,22 @@ class MotorManager(object):
     def quit(self):
         self.run_rotation(0, 0)
 
-    def run_periscope(self, degrees: int, threshold: int, speed: int):
+    def run_periscope(self, degrees: int, threshold: int, speed: int,
+                      degrees_minimum: int | None = None, degrees_maximum: int | None = None):
         if self.periscope_motor is None:
             return
 
-        if self.periscope_motor.get_position() >= threshold:
+        position = self.periscope_motor.get_position()
+        if position >= threshold:
+            if degrees_maximum is not None:
+                degrees += (position - degrees_maximum)
+
             logger.info("Starting Periscope ({} @ {})", degrees, -speed)
             self.periscope_motor.run_for_degrees(degrees, -speed, False)
         else:
+            if degrees_minimum is not None:
+                degrees -= (position - degrees_minimum)
+
             logger.info("Starting Periscope ({} @ {})", degrees, speed)
             self.periscope_motor.run_for_degrees(degrees, speed, False)
 
