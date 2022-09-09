@@ -30,13 +30,13 @@ class MotorManager(object):
             if degrees_maximum is not None:
                 degrees += (position - degrees_maximum)
 
-            logger.info("Starting Periscope ({} @ {})", degrees, -speed)
+            logger.info("Starting Periscope ({} {} @ {})", position, degrees, -speed)
             self.periscope_motor.run_for_degrees(degrees, -speed, False)
         else:
             if degrees_minimum is not None:
                 degrees -= (position - degrees_minimum)
 
-            logger.info("Starting Periscope ({} @ {})", degrees, speed)
+            logger.info("Starting Periscope ({} {} @ {})", position, degrees, speed)
             self.periscope_motor.run_for_degrees(degrees, speed, False)
 
     def run_rotation(self, threshold: int, speed: int, invert: bool = False):
