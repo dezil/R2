@@ -121,7 +121,8 @@ class InputManager(object):
             if event.axis == 0:
                 self.motor_manager.run_rotation(
                     constant.ROTATION_THRESHOLD,
-                    max(-100, min(100, util.scale(event.value, (0.0, 1.0), (0, 100))))
+                    max(-100, min(100, util.scale(event.value, (0.0, 1.0), (0, 100)))),
+                    constant.ROTATION_INVERT
                 )
 
     def list_devices(self):

@@ -31,11 +31,11 @@ class MotorManager(object):
             logger.info("Starting Periscope ({} @ {})", degrees, speed)
             self.periscope_motor.run_for_degrees(degrees, speed, False)
 
-    def run_rotation(self, threshold: int, speed: int):
+    def run_rotation(self, threshold: int, speed: int, invert: bool = False):
         if self.rotation_motor is None:
             return
 
-        if constant.ROTATION_INVERT:
+        if invert:
             if speed > 0:
                 speed = -speed
             elif speed < 0:
