@@ -14,6 +14,7 @@ class MotorManager(object):
         try:
             self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
             self.rotation_motor = Motor(constant.ROTATION_MOTOR)
+            self.rotation_motor.plimit(1)
         except Exception as ex:
             logger.error(ex)
 
