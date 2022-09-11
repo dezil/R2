@@ -1,0 +1,15 @@
+# Created by Alex Thomson
+
+[Unit]
+Description=Power Consumption
+After=multi-user.target
+
+[Service]
+Type=oneshot
+# Disable USB Controller
+ExecStart=/usr/bin/echo "1-1" | /usr/bin/tee /sys/bus/usb/drivers/usb/unbind
+# Disable HDMI Output
+ExecStart=/opt/vc/bin/tvservice -o
+
+[Install]
+WantedBy=multi-user.target

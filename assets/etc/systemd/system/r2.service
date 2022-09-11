@@ -1,0 +1,16 @@
+# Created by Alex Thomson
+
+[Unit]
+Description=R2
+After=bluetooth.service
+After=sound.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python main.py
+WorkingDirectory=/home/pi/R2/
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
