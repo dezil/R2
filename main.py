@@ -1,9 +1,11 @@
 import constant
 import os
+import platform
 os.environ["LOGURU_LEVEL"] = constant.LOG_LEVEL
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
-os.environ["SDL_VIDEODRIVER"] = "dummy"
+if platform.system() == "Linux":
+    os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 import asyncio
 import pygame
