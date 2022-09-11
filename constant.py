@@ -1,4 +1,4 @@
-AUDIO_PATH = "/home/pi/ftp/files/R2/"
+AUDIO_PATH = "./assets/"
 AUDIO_VOLUME = 1.0
 AUTO_CATEGORY = "music"
 AUTO_INTERVAL = 60
