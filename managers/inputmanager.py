@@ -92,7 +92,7 @@ class InputManager(object):
             # Triangle Button
             if event.button == 12:
                 logger.trace("Triangle Button")
-                self.audio_manager.play_random_sound("alarms")
+                self.audio_manager.play_random_sound("alarm")
 
             # Circle Button
             if event.button == 13:
