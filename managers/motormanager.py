@@ -22,7 +22,8 @@ class MotorManager(object):
                 self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
                 self.rotation_motor = Motor(constant.ROTATION_MOTOR)
                 self.rotation_motor.plimit(1)
-            except BuildHATError as ex:
+            except BuildHATError:
+                logger.debug("Waiting for BuildHAT...")
                 time.sleep(1)
                 continue
             except Exception as ex:
