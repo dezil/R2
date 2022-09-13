@@ -4,11 +4,13 @@ import time
 
 from buildhat import BuildHATError, Motor
 from loguru import logger
+from managers import LightManager
 
 
 class MotorManager(object):
 
-    def __init__(self):
+    def __init__(self, light_manager: LightManager):
+        self.light_manager = light_manager
         self.periscope_motor: Motor | None = None
         self.rotation_motor: Motor | None = None
 
@@ -43,10 +45,12 @@ class MotorManager(object):
             degrees = position - degrees_minimum
             logger.info("Starting Periscope (from {}, to {}, at {})", position, degrees, -speed)
             self.periscope_motor.run_for_degrees(degrees, -speed, False)
+            self.light_manager.run_periscope(False)
         else:
             degrees = degrees_maximum - (position - degrees_minimum)
             logger.info("Starting Periscope (from {}, to {}, at {})", position, degrees, speed)
             self.periscope_motor.run_for_degrees(degrees, speed, False)
+            self.light_manager.run_periscope(True)
 
     def run_rotation(self, threshold: int, speed: int, invert: bool = False):
         if self.rotation_motor is None:

@@ -11,13 +11,14 @@ import asyncio
 import pygame
 import sys
 
-from managers import AudioManager, InputManager, MotorManager
+from managers import AudioManager, InputManager, LightManager, MotorManager
 from autonomous import Autonomous
 from loguru import logger
 
 audio_manager = AudioManager()
 autonomous = Autonomous(audio_manager)
-motor_manager = MotorManager()
+light_manager = LightManager()
+motor_manager = MotorManager(light_manager)
 input_manager = InputManager(audio_manager, autonomous, motor_manager)
 
 
@@ -27,6 +28,7 @@ async def main():
     try:
         pygame.init()
         input_manager.init()
+        light_manager.init()
         motor_manager.init()
 
         if len(sys.argv) == 1 and sys.argv[0] == "dump":
@@ -53,6 +55,7 @@ async def main():
         logger.error(ex)
     finally:
         autonomous.stop()
+        light_manager.quit()
         motor_manager.quit()
         input_manager.quit()
         pygame.quit()
