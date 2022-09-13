@@ -47,6 +47,8 @@ async def main():
             input_manager.handle(event)
 
         logger.info("Stopping...")
+    except KeyboardInterrupt as ex:
+        logger.warning("KeyboardInterrupt, Stopping...")
     except Exception as ex:
         logger.error(ex)
     finally:
