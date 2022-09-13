@@ -1,6 +1,7 @@
 import constant
+import time
 
-from buildhat import Motor
+from buildhat import BuildHATError, Motor
 from loguru import logger
 
 
@@ -11,12 +12,18 @@ class MotorManager(object):
         self.rotation_motor: Motor | None = None
 
     def init(self):
-        try:
-            self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
-            self.rotation_motor = Motor(constant.ROTATION_MOTOR)
-            self.rotation_motor.plimit(1)
-        except Exception as ex:
-            logger.error(ex)
+        while True:
+            try:
+                self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
+                self.rotation_motor = Motor(constant.ROTATION_MOTOR)
+                self.rotation_motor.plimit(1)
+            except BuildHATError as ex:
+                time.sleep(1)
+                continue
+            except Exception as ex:
+                logger.error(ex)
+
+            break
 
     def quit(self):
         self.run_rotation(0, 0)
