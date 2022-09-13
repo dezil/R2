@@ -1,4 +1,5 @@
 import constant
+import os
 import pygame
 import util
 
@@ -79,7 +80,7 @@ class InputManager(object):
 
             # R2 Button
             if event.button == 9:
-                logger.trace("R2 Button")
+                self.audio_manager.play_sound(os.path.join(constant.AUDIO_PATH, "R2BDAY1.mp3"))
 
             # L1 Button
             if event.button == 10:
@@ -87,7 +88,7 @@ class InputManager(object):
 
             # R1 Button
             if event.button == 11:
-                logger.trace("R1 Button")
+                self.audio_manager.play_sound(os.path.join(constant.AUDIO_PATH, "R2PLAYME.mp3"))
 
             # Triangle Button
             if event.button == 12:
