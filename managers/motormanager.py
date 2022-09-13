@@ -1,4 +1,5 @@
 import constant
+import platform
 import time
 
 from buildhat import BuildHATError, Motor
@@ -12,6 +13,10 @@ class MotorManager(object):
         self.rotation_motor: Motor | None = None
 
     def init(self):
+        if platform.system() == "Windows":
+            logger.warning("Unsupported Platform: {}", platform.system())
+            return
+
         while True:
             try:
                 self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
