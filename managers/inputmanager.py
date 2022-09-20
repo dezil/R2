@@ -84,7 +84,7 @@ class InputManager(object):
 
             # L1 Button
             if event.button == 10:
-                logger.trace("L1 Button")
+				self.audio_manager.play_sound(os.path.join(constant.AUDIO_PATH, "sounds_WOLFWSTL.mp3"))
 
             # R1 Button
             if event.button == 11:
