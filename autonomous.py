@@ -1,6 +1,7 @@
 import asyncio
 import constant
 
+from loguru import logger
 from managers import AudioManager
 
 
@@ -25,8 +26,10 @@ class Autonomous(object):
 
     def toggle(self):
         if self.task is None:
+            logger.info("Starting Automation")
             self.start()
         else:
+            logger.info("Stopping Automation")
             self.stop()
 
     async def run(self):
