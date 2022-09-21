@@ -38,7 +38,7 @@ class InputManager(object):
 
             # Select Button
             if event.button == 0:
-                logger.trace("Select Button")
+                self.autonomous.toggle()
 
             # L3 Button
             if event.button == 1:
@@ -117,7 +117,7 @@ class InputManager(object):
 
             # Full Down
             if event.axis == 1 and event.value >= 1.0:
-                self.autonomous.toggle()
+                pass
 
             # Left / Right
             if event.axis == 0:
