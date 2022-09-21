@@ -1,38 +1,40 @@
-import asyncio
 import constant
 
 from loguru import logger
 from managers import AudioManager
+from threading import Event, Thread
 
 
 class Autonomous(object):
 
     def __init__(self, audio_manager: AudioManager):
         self.audio_manager = audio_manager
-        self.task: asyncio.Task | None = None
+        self.event: Event = Event()
+        self.event.set()
+        self.thread: Thread | None = None
 
     def start(self):
-        if self.task is not None:
+        if not self.event.is_set():
             return
 
-        self.task = asyncio.create_task(self.run())
+        logger.info("Starting Automation")
+        self.event.clear()
+        Thread(target=self.run, name="Autonomous Thread").start()
 
     def stop(self):
-        if self.task is None:
+        if self.event.is_set():
             return
 
-        self.task.cancel()
-        self.task = None
+        logger.info("Stopping Automation")
+        self.event.set()
 
     def toggle(self):
-        if self.task is None:
-            logger.info("Starting Automation")
+        if self.event.is_set():
             self.start()
         else:
-            logger.info("Stopping Automation")
             self.stop()
 
-    async def run(self):
-        while self.task is not None and not self.task.cancelled():
+    def run(self):
+        self.audio_manager.play_random_sound(constant.AUTO_CATEGORY)
+        while not self.event.wait(constant.AUTO_INTERVAL):
             self.audio_manager.play_random_sound(constant.AUTO_CATEGORY)
-            await asyncio.sleep(constant.AUTO_INTERVAL)
