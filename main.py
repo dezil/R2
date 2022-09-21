@@ -7,7 +7,6 @@ os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
 if platform.system() != "Windows":
     os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-import asyncio
 import pygame
 import sys
 
@@ -22,7 +21,7 @@ motor_manager = MotorManager(light_manager)
 input_manager = InputManager(audio_manager, autonomous, motor_manager)
 
 
-async def main():
+def main():
     logger.info("Starting...")
 
     try:
@@ -64,4 +63,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
