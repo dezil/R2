@@ -34,11 +34,11 @@ class InputManager(object):
             logger.info("Joystick {} disconnected", event.instance_id)
 
         if event.type == pygame.JOYBUTTONUP:
-            self.autonomous.stop()
-
             # Select Button
             if event.button == 0:
                 self.autonomous.toggle()
+            else:
+                self.autonomous.stop()
 
             # L3 Button
             if event.button == 1:
