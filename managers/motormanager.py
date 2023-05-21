@@ -2,6 +2,7 @@ import constant
 import platform
 import time
 
+from pyvesc import VESC
 from buildhat import BuildHATError, Motor
 from loguru import logger
 from managers import LightManager
@@ -13,6 +14,10 @@ class MotorManager(object):
         self.light_manager = light_manager
         self.periscope_motor: Motor | None = None
         self.rotation_motor: Motor | None = None
+        self.track_left: VESC | None = None
+        self.track_right: VESC | None = None
+        self.stickPitch: float = 0
+        self.stickYaw: float = 0
 
     def init(self):
         if platform.system() == "Windows":
@@ -21,9 +26,11 @@ class MotorManager(object):
 
         while True:
             try:
-                self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
-                self.rotation_motor = Motor(constant.ROTATION_MOTOR)
-                self.rotation_motor.plimit(1)
+                if constant.PERISCOPE_ENABLED:
+                    self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
+                if constant.ROTATION_ENABLED:
+                    self.rotation_motor = Motor(constant.ROTATION_MOTOR)
+                    self.rotation_motor.plimit(1)
             except BuildHATError:
                 logger.debug("Waiting for BuildHAT...")
                 time.sleep(1)
@@ -33,8 +40,14 @@ class MotorManager(object):
 
             break
 
+        if constant.TRACK_ENABLED:
+            self.track_left = VESC(constant.TRACK_TTY_LEFT)
+            self.track_right = VESC(constant.TRACK_TTY_RIGHT)
+
     def quit(self):
         self.run_rotation(0, 0)
+        self.track_left.stop_heartbeat()
+        self.track_right.stop_heartbeat()
 
     def run_periscope(self, degrees_minimum: int, degrees_maximum: int, threshold: int, speed: int):
         if self.periscope_motor is None:
@@ -68,3 +81,22 @@ class MotorManager(object):
         else:
             logger.info("Starting Rotation ({})", str(speed))
             self.rotation_motor.start(speed)
+
+    def set_tracks(self): 
+        if not constant.TRACK_ENABLED:
+            return
+        
+        throttle = max(0, abs(self.stickPitch) - 0.05) 
+        yaw = max(0, abs(self.stickYaw) - 0.05) 
+
+        if self.stickPitch > 0:
+            throttle = throttle * - 1
+            
+        if self.stickYaw < 0:
+            yaw = yaw * - 1
+
+        throttle_left = min(throttle + yaw, 1)
+        throttle_right = min(throttle - yaw, 1)
+
+        self.track_left.set_duty_cycle(throttle_left)
+        self.track_right.set_duty_cycle(throttle_right)

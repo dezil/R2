@@ -101,16 +101,17 @@ class InputManager(object):
                 self.audio_manager.play_random_sound("scream")
 
         if event.type == pygame.JOYAXISMOTION:
-            # Full Up
-            if event.axis == 1 and event.value <= -1.0:
-                pass
-
-            # Full Down
-            if event.axis == 1 and event.value >= 1.0:
-                pass
-
-            # Left / Right
+            # Left Stick | Left / Right
             if event.axis == 0:
+                self.motor_manager.stickYaw = event.value
+                self.motor_manager.set_tracks()
+            # Left Stick | Up / Down
+            elif event.axis == 1:
+                self.motor_manager.stickPitch = event.value
+                self.motor_manager.set_tracks()
+            
+            # Right Stick | Left / Right
+            elif event.axis == 3:
                 self.motor_manager.run_rotation(
                     constant.ROTATION_THRESHOLD,
                     max(-100, min(100, int(util.scale(event.value, (0.0, 1.0), (0, 100))))),
