@@ -34,27 +34,29 @@ class InputManager(object):
             logger.info("Joystick {} disconnected", event.instance_id)
 
         if event.type == pygame.JOYBUTTONUP:
-            # Select Button
+            # A Button
             if event.button == 0:
-                self.autonomous.toggle()
-            else:
-                self.autonomous.stop()
+                self.audio_manager.play_random_sound("scream")
+                logger.trace("A Button")
 
-            # L3 Button
+            # B Button
             if event.button == 1:
-                logger.trace("L3 Button")
+                self.audio_manager.play_random_sound("misc")
+                logger.trace("B Button")
 
-            # R3 Button
+            # X Button
             if event.button == 2:
-                logger.trace("R3 Button")
+                self.audio_manager.play_random_sound("music")
+                logger.trace("X Button")
 
-            # Start Button
+            # Y button
             if event.button == 3:
-                logger.trace("Start Button")
+                self.audio_manager.play_random_sound("alarm")
+                logger.trace("Y Button")
 
-            # Up Button
+            # Left Bumper
             if event.button == 4:
-                logger.trace("Up Button")
+                logger.trace("Left Bumper")
                 self.motor_manager.run_periscope(
                     constant.PERISCOPE_DEGREES_MINIMUM,
                     constant.PERISCOPE_DEGREES_MAXIMUM,
@@ -62,53 +64,41 @@ class InputManager(object):
                     constant.PERISCOPE_SPEED
                 )
 
-            # Right Button
+            # Right Bumper
             if event.button == 5:
-                logger.trace("Right Button")
+                logger.trace("Right Bumper")
 
-            # Down Button
+            # Back button
             if event.button == 6:
-                logger.trace("Down Button")
+                logger.trace("back Button")
 
-            # Left Button
+            # Start Button
             if event.button == 7:
-                logger.trace("Left Button")
+                logger.trace("Start Button")
 
-            # L2 Button
+            # Left stick click
             if event.button == 8:
-                logger.trace("L2 Button")
+                logger.trace("L stick click")
 
-            # R2 Button
+            # Right stick click
             if event.button == 9:
                 self.audio_manager.play_sound(os.path.join(constant.AUDIO_PATH, "R2BDAY1.mp3"))
+                logger.trace("R stick Click")
 
-            # L1 Button
+            # guide button
             if event.button == 10:
-                self.audio_manager.play_sound(os.path.join(constant.AUDIO_PATH, "sounds_WOLFWSTL.mp3"))
+                logger.trace("Guide Button")
 
             # R1 Button
             if event.button == 11:
-                self.audio_manager.play_sound(os.path.join(constant.AUDIO_PATH, "R2PLAYME.mp3"))
-
-            # Triangle Button
-            if event.button == 12:
-                logger.trace("Triangle Button")
-                self.audio_manager.play_random_sound("alarm")
-
-            # Circle Button
-            if event.button == 13:
-                logger.trace("Circle Button")
-                self.audio_manager.play_random_sound("misc")
+                self.autonomous.toggle()
+            else:
+                self.autonomous.stop()
 
             # Cross Button
             if event.button == 14:
                 logger.trace("Cross Button")
                 self.audio_manager.play_random_sound("scream")
-
-            # Square Button
-            if event.button == 15:
-                logger.trace("Square Button")
-                self.audio_manager.play_random_sound("music")
 
         if event.type == pygame.JOYAXISMOTION:
             # Full Up
