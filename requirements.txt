@@ -3,3 +3,5 @@ gpiozero~=1.6.2
 loguru~=0.6.0
 pygame~=2.1.2
 pyserial~=3.5
+pythoncrc~=1.21
+pyvesc @ git+https://github.com/LiamBindle/PyVESC@master
