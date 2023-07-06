@@ -1,6 +1,7 @@
 import constant
 import platform
 import time
+import util
 
 from pyvesc import VESC
 from buildhat import BuildHATError, Motor
@@ -18,6 +19,9 @@ class MotorManager(object):
         self.track_right: VESC | None = None
         self.stickPitch: float = 0
         self.stickYaw: float = 0
+        self.motor_lock: bool = True
+        self.motor_left_throttle_last: float = 0
+        self.motor_right_throttle_last: float = 0
 
     def init(self):
         if platform.system() == "Windows":
@@ -86,6 +90,15 @@ class MotorManager(object):
         if not constant.TRACK_ENABLED:
             return
         
+        if self.motor_lock:
+            if self.motor_left_throttle_last != 0 or self.motor_right_throttle_last != 0:
+                self.track_left.set_duty_cycle(0)
+                self.track_right.set_duty_cycle(0)
+
+                self.motor_left_throttle_last = 0
+                self.motor_right_throttle_last = 0
+            return
+        
         throttle = max(0, abs(self.stickPitch) - 0.05) 
         yaw = max(0, abs(self.stickYaw) - 0.05) 
 
@@ -98,5 +111,11 @@ class MotorManager(object):
         throttle_left = min(throttle + yaw, 1)
         throttle_right = min(throttle - yaw, 1)
 
-        self.track_left.set_duty_cycle(throttle_left)
-        self.track_right.set_duty_cycle(throttle_right)
+        rpm_left = max(-constant.TRACK_MAX_SPEED, min(constant.TRACK_MAX_SPEED, int(util.scale(throttle_left, (0.0, 1.0), (0, constant.TRACK_MAX_SPEED)))))
+        rpm_right = max(-constant.TRACK_MAX_SPEED, min(constant.TRACK_MAX_SPEED, int(util.scale(throttle_right, (0.0, 1.0), (0, constant.TRACK_MAX_SPEED)))))
+
+        self.track_left.set_rpm(rpm_left)
+        self.track_right.set_rpm(rpm_right)
+
+        self.motor_left_throttle_last = throttle_left
+        self.motor_right_throttle_last = throttle_right

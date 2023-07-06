@@ -109,7 +109,14 @@ class InputManager(object):
             elif event.axis == 1:
                 self.motor_manager.stickPitch = event.value
                 self.motor_manager.set_tracks()
-            
+            # Trigger Left
+            elif event.axis == 2:
+                if event.value >= 0.5:
+                    self.motor_manager.motor_lock = False
+                    logger.trace("Motor Unlocked")
+                elif event.value <= -0.5:
+                    self.motor_manager.motor_lock = True
+                    logger.trace("Motor Locked")
             # Right Stick | Left / Right
             elif event.axis == 3:
                 self.motor_manager.run_rotation(
