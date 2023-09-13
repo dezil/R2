@@ -100,6 +100,10 @@ class InputManager(object):
                 logger.trace("Cross Button")
                 self.audio_manager.play_random_sound("scream")
 
+        # Dpad Up / Down | Left / Right
+        if event.type == pygame.JOYHATMOTION:
+            self.audio_manager.play_dpad(event)
+            
         if event.type == pygame.JOYAXISMOTION:
             # Left Stick | Left / Right
             if event.axis == 0:
@@ -124,6 +128,12 @@ class InputManager(object):
                     max(-100, min(100, int(util.scale(event.value, (0.0, 1.0), (0, 100))))),
                     constant.ROTATION_INVERT
                 )
+            # Right Trigger
+            elif event.axis == 5:
+                if event.value >= 0.5:
+                    self.audio_manager.alternate_sound = True
+                elif event.value <= -0.5:
+                    self.audio_manager.alternate_sound = False
 
     def list_devices(self):
         logger.info("Devices:")
