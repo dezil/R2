@@ -57,16 +57,12 @@ class InputManager(object):
             # Left Bumper
             if event.button == 4:
                 logger.trace("Left Bumper")
-                self.motor_manager.run_periscope(
-                    constant.PERISCOPE_DEGREES_MINIMUM,
-                    constant.PERISCOPE_DEGREES_MAXIMUM,
-                    constant.PERISCOPE_THRESHOLD,
-                    constant.PERISCOPE_SPEED
-                )
+                self.motor_manager.run_door('left')
 
             # Right Bumper
             if event.button == 5:
                 logger.trace("Right Bumper")
+                self.motor_manager.run_door('right')
 
             # Back button
             if event.button == 6:

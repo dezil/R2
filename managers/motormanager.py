@@ -12,6 +12,9 @@ from managers import LightManager
 class MotorManager(object):
 
     def __init__(self, light_manager: LightManager):
+        self.left_door_motor: Motor | None = None
+        self.right_door_motor: Motor | None = None
+
         self.light_manager = light_manager
         self.periscope_motor: Motor | None = None
         self.rotation_motor: Motor | None = None
@@ -30,8 +33,10 @@ class MotorManager(object):
 
         while True:
             try:
-                if constant.PERISCOPE_ENABLED:
-                    self.periscope_motor = Motor(constant.PERISCOPE_MOTOR)
+                if constant.DOOR_LEFT_ENABLED:
+                    self.left_door_motor = Motor(constant.DOOR_LEFT_MOTOR)
+                if constant.DOOR_RIGHT_ENABLED:
+                    self.right_door_motor = Motor(constant.DOOR_RIGHT_MOTOR)
                 if constant.ROTATION_ENABLED:
                     self.rotation_motor = Motor(constant.ROTATION_MOTOR)
                     self.rotation_motor.plimit(1)
@@ -52,6 +57,41 @@ class MotorManager(object):
         self.run_rotation(0, 0)
         self.track_left.stop_heartbeat()
         self.track_right.stop_heartbeat()
+
+    def run_door(self, door: str):
+        if self.left_door_motor is None or self.right_door_motor is None:
+            return
+
+        degrees_minimum: int = 0
+        degrees_maximum: int = 0
+        threshold: int = 0
+        speed: int = 0
+        motor: Motor | None = None
+
+        if door == "left":
+            degrees_minimum = constant.DOOR_LEFT_DEGREES_MINIMUM
+            degrees_maximum = constant.DOOR_LEFT_DEGREES_MAXIMUM
+            threshold = constant.DOOR_LEFT_THRESHOLD
+            speed = constant.DOOR_LEFT_SPEED
+            motor = self.left_door_motor
+        elif door == "right":
+            degrees_minimum = constant.DOOR_RIGHT_DEGREES_MINIMUM
+            degrees_maximum = constant.DOOR_RIGHT_DEGREES_MAXIMUM
+            threshold = constant.DOOR_RIGHT_THRESHOLD
+            speed = constant.DOOR_RIGHT_SPEED
+            motor = self.right_door_motor
+        else:
+            return
+
+        position = motor.get_position()
+        if position >= threshold:
+            degrees = position - degrees_minimum
+            logger.info("Starting Door (from {}, to {}, at {})", position, degrees, -speed)
+            motor.run_for_degrees(degrees, -speed, False)
+        else:
+            degrees = degrees_maximum - (position - degrees_minimum)
+            logger.info("Starting Door (from {}, to {}, at {})", position, degrees, speed)
+            motor.run_for_degrees(degrees, speed, False)
 
     def run_periscope(self, degrees_minimum: int, degrees_maximum: int, threshold: int, speed: int):
         if self.periscope_motor is None:
