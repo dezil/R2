@@ -12,19 +12,26 @@ from managers import LightManager
 class MotorManager(object):
 
     def __init__(self, light_manager: LightManager):
-        self.left_door_motor: Motor | None = None
-        self.right_door_motor: Motor | None = None
-
         self.light_manager = light_manager
-        self.periscope_motor: Motor | None = None
         self.rotation_motor: Motor | None = None
+
+        self.arm_motor: Motor | None = None
+        self.arm_open: bool = False
+        self.arm_sequence: int = 0
+        
+        self.door_left_motor: Motor | None = None
+        self.door_left_open: bool = False
+        self.door_right_motor: Motor | None = None
+        self.door_right_open: bool = False
+                
+        self.track_lock: bool = True
         self.track_left: VESC | None = None
+        self.track_left_throttle_last: float = 0
         self.track_right: VESC | None = None
-        self.stickPitch: float = 0
-        self.stickYaw: float = 0
-        self.motor_lock: bool = True
-        self.motor_left_throttle_last: float = 0
-        self.motor_right_throttle_last: float = 0
+        self.track_right_throttle_last: float = 0
+
+        self.stick_pitch: float = 0
+        self.stick_yaw: float = 0
 
     def init(self):
         if platform.system() == "Windows":
@@ -33,14 +40,17 @@ class MotorManager(object):
 
         while True:
             try:
+                if constant.ARM_ENABLED:
+                    self.arm_motor = Motor(constant.ARM_MOTOR)
                 if constant.DOOR_LEFT_ENABLED:
-                    self.left_door_motor = Motor(constant.DOOR_LEFT_MOTOR)
+                    self.door_left_motor = Motor(constant.DOOR_LEFT_MOTOR)
                 if constant.DOOR_RIGHT_ENABLED:
-                    self.right_door_motor = Motor(constant.DOOR_RIGHT_MOTOR)
+                    self.door_right_motor = Motor(constant.DOOR_RIGHT_MOTOR)
                 if constant.ROTATION_ENABLED:
                     self.rotation_motor = Motor(constant.ROTATION_MOTOR)
                     self.rotation_motor.plimit(1)
-            except BuildHATError:
+            except BuildHATError as e:
+                logger.error(e)
                 logger.debug("Waiting for BuildHAT...")
                 time.sleep(1)
                 continue
@@ -58,56 +68,74 @@ class MotorManager(object):
         self.track_left.stop_heartbeat()
         self.track_right.stop_heartbeat()
 
-    def run_door(self, door: str):
-        if self.left_door_motor is None or self.right_door_motor is None:
+    def run_arm_sequence(self):
+        if self.arm_sequence == 0:
+            self.run_door_right(True)
+        elif self.arm_sequence == 1:
+            self.run_arm(True)
+        elif self.arm_sequence == 2:
+            self.run_arm(True)
+        elif self.arm_sequence == 3:
+            self.run_door_right(True)
+
+        if self.arm_sequence < 3:
+            self.arm_sequence += 1
+        else:
+            self.arm_sequence = 0
+
+    def run_arm(self, blocking=False):
+        if self.arm_motor is None:
             return
 
-        degrees_minimum: int = 0
-        degrees_maximum: int = 0
-        threshold: int = 0
-        speed: int = 0
-        motor: Motor | None = None
-
-        if door == "left":
-            degrees_minimum = constant.DOOR_LEFT_DEGREES_MINIMUM
-            degrees_maximum = constant.DOOR_LEFT_DEGREES_MAXIMUM
-            threshold = constant.DOOR_LEFT_THRESHOLD
-            speed = constant.DOOR_LEFT_SPEED
-            motor = self.left_door_motor
-        elif door == "right":
-            degrees_minimum = constant.DOOR_RIGHT_DEGREES_MINIMUM
-            degrees_maximum = constant.DOOR_RIGHT_DEGREES_MAXIMUM
-            threshold = constant.DOOR_RIGHT_THRESHOLD
-            speed = constant.DOOR_RIGHT_SPEED
-            motor = self.right_door_motor
+        if self.arm_open:
+            degrees = constant.ARM_DEGREES_CLOSE
         else:
+            degrees = constant.ARM_DEGREES_OPEN
+
+        logger.info("Arm changing from {} to {} position: (degrees {})", 
+            "opened" if self.arm_open else "closed",
+            "opened" if not self.arm_open else "closed",
+            degrees
+        )
+
+        self.arm_motor.run_for_degrees(degrees, constant.ARM_SPEED, blocking)
+        self.arm_open = not self.arm_open
+
+    def run_door_left(self, blocking=False):
+        if self.door_left_motor is None:
             return
 
-        position = motor.get_position()
-        if position >= threshold:
-            degrees = position - degrees_minimum
-            logger.info("Starting Door (from {}, to {}, at {})", position, degrees, -speed)
-            motor.run_for_degrees(degrees, -speed, False)
+        if self.door_left_open:
+            degrees = constant.DOOR_LEFT_DEGREES_CLOSE
         else:
-            degrees = degrees_maximum - (position - degrees_minimum)
-            logger.info("Starting Door (from {}, to {}, at {})", position, degrees, speed)
-            motor.run_for_degrees(degrees, speed, False)
+            degrees = constant.DOOR_LEFT_DEGREES_OPEN
 
-    def run_periscope(self, degrees_minimum: int, degrees_maximum: int, threshold: int, speed: int):
-        if self.periscope_motor is None:
+        logger.info("Door Left changing from {} to {} position: (degrees {})", 
+            "opened" if self.door_left_open else "closed",
+            "opened" if not self.door_left_open else "closed",
+            degrees
+        )
+
+        self.door_left_motor.run_for_degrees(degrees, constant.DOOR_LEFT_SPEED, blocking)
+        self.door_left_open = not self.door_left_open
+    
+    def run_door_right(self, blocking=False):
+        if self.door_right_motor is None:
             return
 
-        position = self.periscope_motor.get_position()
-        if position >= threshold:
-            degrees = position - degrees_minimum
-            logger.info("Starting Periscope (from {}, to {}, at {})", position, degrees, -speed)
-            self.periscope_motor.run_for_degrees(degrees, -speed, False)
-            self.light_manager.run_periscope(False)
+        if self.door_right_open:
+            degrees = constant.DOOR_RIGHT_DEGREES_CLOSE
         else:
-            degrees = degrees_maximum - (position - degrees_minimum)
-            logger.info("Starting Periscope (from {}, to {}, at {})", position, degrees, speed)
-            self.periscope_motor.run_for_degrees(degrees, speed, False)
-            self.light_manager.run_periscope(True)
+            degrees = constant.DOOR_RIGHT_DEGREES_OPEN
+
+        logger.info("Right Door changing from {} to {} position: (degrees {})", 
+            "opened" if self.door_right_open else "closed",
+            "opened" if not self.door_right_open else "closed",
+            degrees
+        )
+
+        self.door_right_motor.run_for_degrees(degrees, constant.DOOR_RIGHT_SPEED, blocking)
+        self.door_right_open = not self.door_right_open
 
     def run_rotation(self, threshold: int, speed: int, invert: bool = False):
         if self.rotation_motor is None:
@@ -120,32 +148,32 @@ class MotorManager(object):
                 speed = abs(speed)
 
         if -threshold <= speed <= threshold:
-            logger.info("Stopping Rotation")
+            logger.trace("Stopping Rotation")
             self.rotation_motor.stop()
         else:
-            logger.info("Starting Rotation ({})", str(speed))
+            logger.trace("Starting Rotation ({})", str(speed))
             self.rotation_motor.start(speed)
 
     def set_tracks(self): 
         if not constant.TRACK_ENABLED:
             return
         
-        if self.motor_lock:
-            if self.motor_left_throttle_last != 0 or self.motor_right_throttle_last != 0:
+        if self.track_lock:
+            if self.track_left_throttle_last != 0 or self.track_right_throttle_last != 0:
                 self.track_left.set_duty_cycle(0)
                 self.track_right.set_duty_cycle(0)
 
-                self.motor_left_throttle_last = 0
-                self.motor_right_throttle_last = 0
+                self.track_left_throttle_last = 0
+                self.track_right_throttle_last = 0
             return
         
-        throttle = max(0, abs(self.stickPitch) - 0.05) 
-        yaw = max(0, abs(self.stickYaw) - 0.05) 
+        throttle = max(0, abs(self.stick_pitch) - 0.05) 
+        yaw = max(0, abs(self.stick_yaw) - 0.05) 
 
-        if self.stickPitch > 0:
+        if self.stick_pitch > 0:
             throttle = throttle * - 1
             
-        if self.stickYaw < 0:
+        if self.stick_yaw < 0:
             yaw = yaw * - 1
 
         throttle_left = min(throttle + yaw, 1)
@@ -157,5 +185,5 @@ class MotorManager(object):
         self.track_left.set_rpm(rpm_left)
         self.track_right.set_rpm(rpm_right)
 
-        self.motor_left_throttle_last = throttle_left
-        self.motor_right_throttle_last = throttle_right
+        self.track_left_throttle_last = throttle_left
+        self.track_right_throttle_last = throttle_right

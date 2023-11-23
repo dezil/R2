@@ -57,12 +57,12 @@ class InputManager(object):
             # Left Bumper
             if event.button == 4:
                 logger.trace("Left Bumper")
-                self.motor_manager.run_door('left')
+                self.motor_manager.run_door_left()
 
             # Right Bumper
             if event.button == 5:
                 logger.trace("Right Bumper")
-                self.motor_manager.run_door('right')
+                self.motor_manager.run_arm_sequence()
 
             # Back button
             if event.button == 6:
@@ -75,6 +75,7 @@ class InputManager(object):
             # Left stick click
             if event.button == 8:
                 logger.trace("L stick click")
+
 
             # Right stick click
             if event.button == 9:
@@ -103,20 +104,20 @@ class InputManager(object):
         if event.type == pygame.JOYAXISMOTION:
             # Left Stick | Left / Right
             if event.axis == 0:
-                self.motor_manager.stickYaw = event.value
+                self.motor_manager.stick_yaw = event.value
                 self.motor_manager.set_tracks()
             # Left Stick | Up / Down
             elif event.axis == 1:
-                self.motor_manager.stickPitch = event.value
+                self.motor_manager.stick_pitch = event.value
                 self.motor_manager.set_tracks()
             # Trigger Left
             elif event.axis == 2:
                 if event.value >= 0.5:
-                    self.motor_manager.motor_lock = False
-                    logger.trace("Motor Unlocked")
+                    self.motor_manager.track_lock = False
+                    logger.trace("Track Motors Unlocked")
                 elif event.value <= -0.5:
-                    self.motor_manager.motor_lock = True
-                    logger.trace("Motor Locked")
+                    self.motor_manager.track_lock = True
+                    logger.trace("Track Motors Locked")
             # Right Stick | Left / Right
             elif event.axis == 3:
                 self.motor_manager.run_rotation(
